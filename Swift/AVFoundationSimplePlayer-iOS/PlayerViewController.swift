@@ -1,9 +1,9 @@
 /*
-	Copyright (C) 2016 Apple Inc. All Rights Reserved.
-	See LICENSE.txt for this sample’s licensing information
-	
-	Abstract:
-	View controller containing a player view and basic playback controls.
+    Copyright (C) 2016 Apple Inc. All Rights Reserved.
+    See LICENSE.txt for this sample’s licensing information
+    
+    Abstract:
+    View controller containing a player view and basic playback controls.
 */
 
 import Foundation
@@ -11,8 +11,8 @@ import AVFoundation
 import UIKit
 
 /*
-	KVO context used to differentiate KVO callbacks for this class versus other
-	classes in its class hierarchy.
+    KVO context used to differentiate KVO callbacks for this class versus other
+    classes in its class hierarchy.
 */
 private var playerViewControllerKVOContext = 0
 
@@ -25,33 +25,33 @@ class PlayerViewController: UIViewController {
         "hasProtectedContent"
     ]
 
-	let player = AVPlayer()
+    @objc let player = AVPlayer()
 
-	var currentTime: Double {
-		get {
+    var currentTime: Double {
+        get {
             return CMTimeGetSeconds(player.currentTime())
         }
-		set {
+        set {
             let newTime = CMTimeMakeWithSeconds(newValue, 1)
-			player.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-		}
-	}
+            player.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+        }
+    }
 
-	var duration: Double {
+    var duration: Double {
         guard let currentItem = player.currentItem else { return 0.0 }
 
         return CMTimeGetSeconds(currentItem.duration)
-	}
+    }
 
-	var rate: Float {
-		get {
+    var rate: Float {
+        get {
             return player.rate
         }
 
         set {
             player.rate = newValue
         }
-	}
+    }
 
     var asset: AVURLAsset? {
         didSet {
@@ -61,29 +61,29 @@ class PlayerViewController: UIViewController {
         }
     }
     
-	private var playerLayer: AVPlayerLayer? {
+    private var playerLayer: AVPlayerLayer? {
         return playerView.playerLayer
     }
-	
-	/*
-	A formatter for individual date components used to provide an appropriate
-	value for the `startTimeLabel` and `durationLabel`.
-	*/
-	let timeRemainingFormatter: DateComponentsFormatter = {
-		let formatter = DateComponentsFormatter()
-		formatter.zeroFormattingBehavior = .pad
-		formatter.allowedUnits = [.minute, .second]
-		
-		return formatter
-	}()
+    
+    /*
+    A formatter for individual date components used to provide an appropriate
+    value for the `startTimeLabel` and `durationLabel`.
+    */
+    let timeRemainingFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.zeroFormattingBehavior = .pad
+        formatter.allowedUnits = [.minute, .second]
+        
+        return formatter
+    }()
 
     /*
         A token obtained from calling `player`'s `addPeriodicTimeObserverForInterval(_:queue:usingBlock:)`
         method.
     */
-	private var timeObserverToken: Any?
+    private var timeObserverToken: Any?
 
-	private var playerItem: AVPlayerItem? = nil {
+    private var playerItem: AVPlayerItem? = nil {
         didSet {
             /*
                 If needed, configure player item here before associating it with a player.
@@ -91,7 +91,7 @@ class PlayerViewController: UIViewController {
             */
             player.replaceCurrentItem(with: self.playerItem)
         }
-	}
+    }
 
     // MARK: - IBOutlets
     
@@ -130,12 +130,12 @@ class PlayerViewController: UIViewController {
         
         // Make sure we don't have a strong reference cycle by only capturing self as weak.
         let interval = CMTimeMake(1, 1)
-		timeObserverToken = player.addPeriodicTimeObserver(forInterval: interval, queue: DispatchQueue.main) { [unowned self] time in
-			let timeElapsed = Float(CMTimeGetSeconds(time))
-			
-			self.timeSlider.value = Float(timeElapsed)
-			self.startTimeLabel.text = self.createTimeString(time: timeElapsed)
-		}
+        timeObserverToken = player.addPeriodicTimeObserver(forInterval: interval, queue: DispatchQueue.main) { [unowned self] time in
+            let timeElapsed = Float(CMTimeGetSeconds(time))
+            
+            self.timeSlider.value = Float(timeElapsed)
+            self.startTimeLabel.text = self.createTimeString(time: timeElapsed)
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -213,41 +213,41 @@ class PlayerViewController: UIViewController {
 
     // MARK: - IBActions
 
-	@IBAction func playPauseButtonWasPressed(_ sender: UIButton) {
-		if player.rate != 1.0 {
+    @IBAction func playPauseButtonWasPressed(_ sender: UIButton) {
+        if player.rate != 1.0 {
             // Not playing forward, so play.
- 			if currentTime == duration {
+             if currentTime == duration {
                 // At end, so got back to begining.
-				currentTime = 0.0
-			}
+                currentTime = 0.0
+            }
 
-			player.play()
-		}
+            player.play()
+        }
         else {
             // Playing, so pause.
-			player.pause()
-		}
-	}
+            player.pause()
+        }
+    }
 
 
 
-	@IBAction func rewindButtonWasPressed(_ sender: UIButton) {
+    @IBAction func rewindButtonWasPressed(_ sender: UIButton) {
         // Rewind no faster than -2.0.
         rate = max(player.rate - 2.0, -2.0)
-	}
-	
+    }
+    
     @IBAction func hangUpButtonWasPressed(_ sender: UIButton) {
         player.pause()
     }
     
     
-	@IBAction func fastForwardButtonWasPressed(_ sender: UIButton) {
+    @IBAction func fastForwardButtonWasPressed(_ sender: UIButton) {
         // Fast forward no faster than 2.0.
         rate = min(player.rate + 2.0, 2.0)
-	}
+    }
 
     
-    func loopBackToIdle() {
+    @objc func loopBackToIdle() {
         currentTime = 3.0
         player.play()
     }
@@ -283,7 +283,7 @@ class PlayerViewController: UIViewController {
 
             let hasValidDuration = newDuration.isNumeric && newDuration.value != 0
             let newDurationSeconds = hasValidDuration ? CMTimeGetSeconds(newDuration) : 0.0
-			let currentTime = hasValidDuration ? Float(CMTimeGetSeconds(player.currentTime())) : 0.0
+            let currentTime = hasValidDuration ? Float(CMTimeGetSeconds(player.currentTime())) : 0.0
 
             timeSlider.maximumValue = Float(newDurationSeconds)
 
@@ -299,7 +299,7 @@ class PlayerViewController: UIViewController {
             
             startTimeLabel.isEnabled = hasValidDuration
             startTimeLabel.text = createTimeString(time: currentTime)
-			
+            
             durationLabel.isEnabled = hasValidDuration
             durationLabel.text = createTimeString(time: Float(newDurationSeconds))
         }
@@ -344,11 +344,11 @@ class PlayerViewController: UIViewController {
         ]
         
         return affectedKeyPathsMappingByKey[key] ?? super.keyPathsForValuesAffectingValue(forKey: key)
-	}
+    }
 
     // MARK: - Error Handling
 
-	func handleErrorWithMessage(_ message: String?, error: Error? = nil) {
+    func handleErrorWithMessage(_ message: String?, error: Error? = nil) {
         NSLog("Error occured with message: \(message ?? "default"), error: \(String(describing: error)).")
     
         let alertTitle = NSLocalizedString("alert.error.title", comment: "Alert title for errors")
@@ -363,14 +363,14 @@ class PlayerViewController: UIViewController {
         alert.addAction(alertAction)
 
         present(alert, animated: true, completion: nil)
-	}
-	
-	// MARK: Convenience
-	
-	func createTimeString(time: Float) -> String {
-		let components = NSDateComponents()
-		components.second = Int(max(0.0, time))
-		
-		return timeRemainingFormatter.string(from: components as DateComponents)!
-	}
+    }
+    
+    // MARK: Convenience
+    
+    func createTimeString(time: Float) -> String {
+        let components = NSDateComponents()
+        components.second = Int(max(0.0, time))
+        
+        return timeRemainingFormatter.string(from: components as DateComponents)!
+    }
 }
